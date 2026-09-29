@@ -1,0 +1,1 @@
+alter table alunos add column ativo tinyint default 1;

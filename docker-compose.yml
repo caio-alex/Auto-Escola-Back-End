@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql-autoescola
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: fiap
+      MYSQL_DATABASE: autoescola3esa
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-autoescola-data:/var/lib/mysql
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pfiap"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql-autoescola-data:
