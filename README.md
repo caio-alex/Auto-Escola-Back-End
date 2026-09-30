@@ -104,10 +104,26 @@ export JWT_SECRET=um-segredo-bem-maior-que-esse
 | DELETE | `/alunos/{id}`   | ADMIN         | Exclui (logicamente) aluno           |
 | POST   | `/usuarios`      | ADMIN         | Cadastra usuário (senha em BCrypt)   |
 | GET    | `/usuarios`      | ADMIN         | Lista usuários (paginado)            |
-| POST   | `/instrucoes`    | ADMIN, USER   | Agenda instrução                     |
-| GET    | `/instrucoes`    | ADMIN, USER   | Lista instruções ativas (paginado)   |
-| GET    | `/instrucoes/{id}` | ADMIN, USER | Detalha instrução                    |
-| DELETE | `/instrucoes/{id}` | ADMIN, USER | Cancela instrução (mín. 30 min de antecedência) |
+| GET    | `/usuarios/me`   | qualquer perfil | Dados do usuário logado (login, perfil, vínculo) |
+| GET    | `/alunos/me`     | ALUNO         | Dados do próprio aluno               |
+| GET    | `/instrutores/me` | INSTRUTOR    | Dados do próprio instrutor           |
+| POST   | `/instrucoes`    | ADMIN, USER, ALUNO | Agenda instrução (ALUNO só agenda para si mesmo) |
+| GET    | `/instrucoes`    | ADMIN, USER, ALUNO, INSTRUTOR | Lista instruções (ALUNO/INSTRUTOR veem só as próprias) |
+| GET    | `/instrucoes/{id}` | ADMIN, USER, ALUNO, INSTRUTOR | Detalha instrução (só a própria, para ALUNO/INSTRUTOR) |
+| DELETE | `/instrucoes/{id}` | ADMIN, USER, ALUNO, INSTRUTOR | Cancela instrução (só a própria, mín. 30 min de antecedência) |
+
+## Perfis de usuário
+
+- **ADMIN** / **USER** — acesso amplo, igual antes (gerenciam instrutores, alunos, usuários e veem toda a agenda).
+- **ALUNO** — vinculado a um `Aluno` específico (`aluno_id` em `usuarios`). Só enxerga e cancela as próprias instruções, e só pode agendar para si mesmo. Não acessa `/alunos`, `/instrutores` ou `/usuarios`.
+- **INSTRUTOR** — vinculado a um `Instrutor` específico (`instrutor_id` em `usuarios`). Só enxerga a própria agenda (não cria agendamentos). Não acessa `/alunos`, `/instrutores` ou `/usuarios`.
+
+Ao cadastrar um usuário com perfil `ALUNO` ou `INSTRUTOR`, informe `id_aluno` ou
+`id_instrutor` correspondente (o aluno/instrutor precisa já existir, e não pode
+já ter outro usuário vinculado).
+
+O token JWT não carrega o perfil — chame `GET /usuarios/me` logo após o login
+para descobrir quem está autenticado e com qual perfil.
 
 ## Pendências conhecidas (Fase 3)
 

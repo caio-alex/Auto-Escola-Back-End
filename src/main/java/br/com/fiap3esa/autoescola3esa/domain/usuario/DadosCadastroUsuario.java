@@ -9,5 +9,9 @@ public record DadosCadastroUsuario(
         @NotBlank
         String senha,
 
-        Perfil perfil) {
+        Perfil perfil,
+
+        Long idAluno,
+
+        Long idInstrutor) {
 }

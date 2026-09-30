@@ -1,5 +1,7 @@
 package br.com.fiap3esa.autoescola3esa.domain.usuario;
 
+import br.com.fiap3esa.autoescola3esa.domain.aluno.Aluno;
+import br.com.fiap3esa.autoescola3esa.domain.instrutor.Instrutor;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -29,10 +31,24 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Perfil perfil;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aluno_id")
+    private Aluno aluno;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "instrutor_id")
+    private Instrutor instrutor;
+
     public Usuario(String login, String senhaCodificada, Perfil perfil) {
+        this(login, senhaCodificada, perfil, null, null);
+    }
+
+    public Usuario(String login, String senhaCodificada, Perfil perfil, Aluno aluno, Instrutor instrutor) {
         this.login = login;
         this.senha = senhaCodificada;
         this.perfil = perfil;
+        this.aluno = aluno;
+        this.instrutor = instrutor;
     }
 
     @Override

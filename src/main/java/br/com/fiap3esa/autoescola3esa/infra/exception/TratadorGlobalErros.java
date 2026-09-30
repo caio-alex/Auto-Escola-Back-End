@@ -4,6 +4,7 @@ import br.com.fiap3esa.autoescola3esa.domain.instrutor.InstrutorNotFoundExceptio
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,11 @@ public class TratadorGlobalErros {
     @ExceptionHandler(InstrutorNotFoundException.class)
     public ResponseEntity<DadosMessageNotFound> tratarInstrutorNotFound(InstrutorNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new DadosMessageNotFound(e.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<DadosMessageNotFound> tratarAccessDenied(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new DadosMessageNotFound(e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

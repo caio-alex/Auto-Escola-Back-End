@@ -7,4 +7,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     UserDetails findByLogin(String username);
 
     boolean existsByLogin(String login);
+
+    boolean existsByAlunoId(Long alunoId);
+
+    boolean existsByInstrutorId(Long instrutorId);
 }

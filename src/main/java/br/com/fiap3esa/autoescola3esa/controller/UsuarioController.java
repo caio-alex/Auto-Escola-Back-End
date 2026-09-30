@@ -2,6 +2,7 @@ package br.com.fiap3esa.autoescola3esa.controller;
 
 import br.com.fiap3esa.autoescola3esa.domain.usuario.DadosCadastroUsuario;
 import br.com.fiap3esa.autoescola3esa.domain.usuario.DadosDetalhamentoUsuario;
+import br.com.fiap3esa.autoescola3esa.domain.usuario.Usuario;
 import br.com.fiap3esa.autoescola3esa.service.UsuarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -42,5 +44,12 @@ public class UsuarioController {
     public ResponseEntity<Page<DadosDetalhamentoUsuario>> listarUsuarios(
             @ParameterObject @PageableDefault(size = 10, sort = "login") Pageable paginacao) {
         return ResponseEntity.ok(service.listarUsuarios(paginacao));
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DadosDetalhamentoUsuario> detalharUsuarioLogado(
+            @AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(service.detalharUsuarioLogado(usuario));
     }
 }

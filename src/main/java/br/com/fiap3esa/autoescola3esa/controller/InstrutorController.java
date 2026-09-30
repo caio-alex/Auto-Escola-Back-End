@@ -1,6 +1,7 @@
 package br.com.fiap3esa.autoescola3esa.controller;
 
 import br.com.fiap3esa.autoescola3esa.domain.instrutor.*;
+import br.com.fiap3esa.autoescola3esa.domain.usuario.Usuario;
 import br.com.fiap3esa.autoescola3esa.service.InstrutorService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -41,10 +42,17 @@ public class InstrutorController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'ALUNO')")
     public ResponseEntity<Page<DadosListagemInstrutor>> listarInstrutores(
             @ParameterObject @PageableDefault(size = 10, sort = "nome") Pageable paginacao) {
         return ResponseEntity.ok(service.listarInstrutores(paginacao));
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('INSTRUTOR')")
+    public ResponseEntity<DadosDetalhamentoInstrutor> detalharPropriosDados(
+            @AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(service.detalharInstrutor(usuario.getInstrutor().getId()));
     }
 
     @GetMapping("/{id}")

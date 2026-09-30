@@ -12,4 +12,8 @@ public interface InstrucaoRepository extends JpaRepository<Instrucao, Long> {
     boolean existsByAlunoIdAndDataHoraBetweenAndCanceladaFalse(Long idAluno, LocalDateTime inicio, LocalDateTime fim);
 
     Page<Instrucao> findAllByCanceladaFalse(Pageable paginacao);
+
+    Page<Instrucao> findAllByAlunoIdAndCanceladaFalse(Long idAluno, Pageable paginacao);
+
+    Page<Instrucao> findAllByInstrutorIdAndCanceladaFalse(Long idInstrutor, Pageable paginacao);
 }
