@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AutoEscola.Api</name>
+    </assembly>
+    <members>
+        <member name="M:AutoEscola.Api.Api.Controllers.AuthController.Login(AutoEscola.Api.Application.DTOs.LoginRequestDto)">
+            <summary>
+            Autentica Aluno, Instrutor ou Admin via E-mail ou CPF e retorna o JWT + Perfil.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.AuthController.ChangePassword(AutoEscola.Api.Application.DTOs.ChangePasswordRequestDto)">
+            <summary>
+            Altera a senha do usuário autenticado (usado também no fluxo de Primeiro Acesso).
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.DashboardController.GetStudentDashboard(System.Guid)">
+            <summary>
+            Retorna a Jornada do Aluno (Tracker da CNH, progresso de aulas práticas e próxima aula).
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.DashboardController.GetAdminKpis">
+            <summary>
+            Retorna os KPIs operacionais para a Secretaria / Administrador.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.LessonsController.GetAvailableSlots(System.DateTime,AutoEscola.Api.Domain.Enums.CnhCategory)">
+            <summary>
+            Consulta os horários disponíveis no dia para o Wizard de Agendamento em 3 Passos.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.LessonsController.GetLessons(System.Nullable{System.Guid},System.Nullable{System.Guid},System.Nullable{System.DateTime})">
+            <summary>
+            Lista aulas filtradas por aluno, instrutor ou data.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.LessonsController.CreateLesson(AutoEscola.Api.Application.DTOs.CreateLessonRequestDto)">
+            <summary>
+            Agenda uma nova aula prática validando conflitos, frota e regras do DETRAN.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.LessonsController.CompleteLesson(System.Guid,AutoEscola.Api.Application.DTOs.CompleteLessonRequestDto)">
+            <summary>
+            Marca uma aula como concluída, registra a nota/feedback do instrutor e incrementa o progresso do aluno.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.LessonsController.CancelLesson(System.Guid,AutoEscola.Api.Application.DTOs.CancelLessonRequestDto)">
+            <summary>
+            Cancela uma aula agendada (valida antecedência mínima de 24h caso acionado pelo aluno).
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.ManagementController.GetVehicles">
+            <summary>
+            Lista todos os veículos da frota.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.ManagementController.UpdateVehicleStatus(System.Guid,AutoEscola.Api.Application.DTOs.UpdateVehicleStatusRequestDto)">
+            <summary>
+            Atualiza o status de um veículo (ex: colocar em MANUTENÇÃO) e retorna aulas impactadas.
+            </summary>
+        </member>
+        <member name="M:AutoEscola.Api.Api.Controllers.ManagementController.CreateStudent(AutoEscola.Api.Application.DTOs.CreateStudentRequestDto)">
+            <summary>
+            Cadastra um novo Aluno (Onboarding pela Secretaria com senha inicial temporária = 6 primeiros dígitos do CPF).
+            </summary>
+        </member>
+    </members>
+</doc>

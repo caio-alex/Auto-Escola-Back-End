@@ -1,142 +1,49 @@
-# Auto Escola 3ESA
+# Auto Escola Back-End (Arquitetura Sênior / SaaS)
 
-API REST para gerenciamento de instrutores, alunos e agendamento de instruções
-de uma auto escola. Projeto base fornecido pela FIAP; evoluído a partir daí
-por Caio Alexandre.
+Este repositório contém o Back-End remodelado em **C# (.NET 8)** seguindo princípios de **Clean Architecture**, **Domain-Driven Design (DDD)**, **RBAC (Controle de Acesso Baseado em Roles)** e **Padronização de Erros (RFC 7807 ProblemDetails)**.
 
-## Stack
+---
 
-- Java 25 + Spring Boot 4
-- MySQL 8 + Flyway (migrations)
-- Spring Security + JWT
-- Swagger / OpenAPI (springdoc)
+## Como Rodar Imediatamente (Zero-Config)
 
-## Como rodar
-
-### 1. Subir o banco de dados
-
-Com Docker instalado, na raiz do projeto:
+O projeto está pré-configurado com **Entity Framework Core In-Memory** (`"UseInMemoryDatabase": true` no `appsettings.json`) e um **Data Seeder automático** (`DbInitializer.cs`), permitindo rodar e testar todos os fluxos no Swagger imediatamente sem precisar subir instância do SQL Server primeiro.
 
 ```bash
-docker compose up -d
+dotnet restore
+dotnet run
 ```
 
-Isso sobe um MySQL em `localhost:3306` já com os bancos `autoescola3esa` e
-`autoescola3esa_test` criados. Os dados ficam em um volume, então persistem
-entre reinicializações do container.
+Acesse no navegador a URL exibida no terminal (ex: `http://localhost:5000`) — o **Swagger UI** abrirá direto na raiz com suporte ao botão **Authorize (JWT)**.
 
-Se preferir um MySQL instalado localmente em vez de Docker, crie os dois
-bancos manualmente:
+*(Para usar **SQL Server**, basta mudar `"UseInMemoryDatabase": false` no `appsettings.json` e rodar `dotnet ef database update`).*
 
-```sql
-create database autoescola3esa;
-create database autoescola3esa_test;
-```
+---
 
-### 2. Rodar a aplicação
+## Credenciais Prontas para Teste (Demo Mode / Seed)
 
-Pelo IntelliJ, execute a classe `AutoEscola3EsaApplication`, ou pelo terminal:
+Você pode logar no endpoint `POST /api/auth/login` usando tanto o **E-mail** quanto o **CPF**:
 
-```bash
-./mvnw spring-boot:run
-```
+| Perfil (Role) | E-mail | CPF | Senha | `profileId` Gerado |
+| :--- | :--- | :--- | :--- | :--- |
+| **ADMIN** | `admin@autoescola.com` | `00000000001` | `Admin@123` | `null` |
+| **STUDENT** | `aluno@autoescola.com` | `12345678909` | `Aluno@123` | `bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1` |
+| **INSTRUCTOR** | `roberto@autoescola.com` | `11122233344` | `Instrutor@123` | `aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1` |
+| **INSTRUCTOR** | `fernanda@autoescola.com` | `55566677788` | `Instrutor@123` | `aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2` |
 
-O Flyway roda as migrations automaticamente na primeira subida, incluindo a
-criação de um usuário administrador padrão.
+---
 
-### 3. Acessar
+## O Que Foi Remodelado Nesta Arquitetura
 
-- API: `http://localhost:8085`
-- Swagger UI: `http://localhost:8085/swagger-ui.html`
-- Health check: `http://localhost:8085/health_check`
-
-## Login padrão
-
-A migration `V11` cria um usuário admin para o primeiro acesso:
-
-| Login | Senha    |
-|-------|----------|
-| admin | admin123 |
-
-**Troque essa senha (ou remova o usuário e crie outro) em qualquer ambiente
-que não seja local/dev.**
-
-## Configuração
-
-As credenciais e o segredo do JWT saem do `application.properties` e vêm de
-variáveis de ambiente, com defaults que reproduzem o setup local descrito
-acima:
-
-| Variável       | Default                  | Descrição                          |
-|----------------|---------------------------|-------------------------------------|
-| `DB_HOST`      | `localhost`                | Host do MySQL                       |
-| `DB_PORT`      | `3306`                      | Porta do MySQL                      |
-| `DB_NAME`      | `autoescola3esa`            | Banco principal                     |
-| `DB_NAME_TEST` | `autoescola3esa_test`       | Banco usado pelos testes            |
-| `DB_USERNAME`  | `root`                      | Usuário do banco                    |
-| `DB_PASSWORD`  | `fiap`                      | Senha do banco                      |
-| `JWT_SECRET`   | `12345678-troque-em-producao` | Segredo usado para assinar o JWT |
-| `SERVER_PORT`  | `8085`                      | Porta da aplicação                  |
-
-Para rodar com valores diferentes, defina as variáveis antes de subir a
-aplicação, por exemplo:
-
-```bash
-export DB_PASSWORD=minhasenha
-export JWT_SECRET=um-segredo-bem-maior-que-esse
-./mvnw spring-boot:run
-```
-
-## Endpoints
-
-| Método | Rota             | Acesso        | Descrição                          |
-|--------|------------------|---------------|--------------------------------------|
-| POST   | `/login`         | Público       | Autenticação, retorna JWT            |
-| POST   | `/instrutores`   | ADMIN         | Cadastra instrutor                   |
-| GET    | `/instrutores`   | ADMIN, USER   | Lista instrutores ativos (paginado)  |
-| GET    | `/instrutores/{id}` | ADMIN      | Detalha instrutor                    |
-| PUT    | `/instrutores`   | ADMIN         | Atualiza instrutor                   |
-| DELETE | `/instrutores/{id}` | ADMIN      | Exclui (logicamente) instrutor       |
-| POST   | `/alunos`        | ADMIN         | Cadastra aluno                       |
-| GET    | `/alunos`        | ADMIN, USER   | Lista alunos ativos (paginado)       |
-| GET    | `/alunos/{id}`   | ADMIN         | Detalha aluno                        |
-| PUT    | `/alunos`        | ADMIN         | Atualiza aluno                       |
-| DELETE | `/alunos/{id}`   | ADMIN         | Exclui (logicamente) aluno           |
-| POST   | `/usuarios`      | ADMIN         | Cadastra usuário (senha em BCrypt)   |
-| GET    | `/usuarios`      | ADMIN         | Lista usuários (paginado)            |
-| GET    | `/usuarios/me`   | qualquer perfil | Dados do usuário logado (login, perfil, vínculo) |
-| GET    | `/alunos/me`     | ALUNO         | Dados do próprio aluno               |
-| GET    | `/instrutores/me` | INSTRUTOR    | Dados do próprio instrutor           |
-| POST   | `/instrucoes`    | ADMIN, USER, ALUNO | Agenda instrução (ALUNO só agenda para si mesmo) |
-| GET    | `/instrucoes`    | ADMIN, USER, ALUNO, INSTRUTOR | Lista instruções (ALUNO/INSTRUTOR veem só as próprias) |
-| GET    | `/instrucoes/{id}` | ADMIN, USER, ALUNO, INSTRUTOR | Detalha instrução (só a própria, para ALUNO/INSTRUTOR) |
-| DELETE | `/instrucoes/{id}` | ADMIN, USER, ALUNO, INSTRUTOR | Cancela instrução (só a própria, mín. 30 min de antecedência) |
-
-## Perfis de usuário
-
-- **ADMIN** / **USER** — acesso amplo, igual antes (gerenciam instrutores, alunos, usuários e veem toda a agenda).
-- **ALUNO** — vinculado a um `Aluno` específico (`aluno_id` em `usuarios`). Só enxerga e cancela as próprias instruções, e só pode agendar para si mesmo. Não acessa `/alunos`, `/instrutores` ou `/usuarios`.
-- **INSTRUTOR** — vinculado a um `Instrutor` específico (`instrutor_id` em `usuarios`). Só enxerga a própria agenda (não cria agendamentos). Não acessa `/alunos`, `/instrutores` ou `/usuarios`.
-
-Ao cadastrar um usuário com perfil `ALUNO` ou `INSTRUTOR`, informe `id_aluno` ou
-`id_instrutor` correspondente (o aluno/instrutor precisa já existir, e não pode
-já ter outro usuário vinculado).
-
-O token JWT não carrega o perfil — chame `GET /usuarios/me` logo após o login
-para descobrir quem está autenticado e com qual perfil.
-
-## Pendências conhecidas (Fase 3)
-
-Algumas exceções ainda não têm tratamento no `TratadorGlobalErros` e por enquanto
-retornam **500** em vez do código HTTP correto:
-- `ValidacaoException` (ex: login duplicado ao cadastrar usuário, regras de agendamento)
-- `AlunoNotFoundException`
-- Token JWT inválido ou expirado
-
-Isso está previsto para a Fase 3 do plano de ação.
-
-## Próximos passos
-
-Consulte o plano de ação em andamento (Fases 2 a 6: CRUD de Aluno e Usuário,
-tratamento de erros, Swagger completo, testes e preparação para o front
-desktop).
+1. **Identidade Unificada (`User` + Perfis 1:1):**
+   * Autenticação centralizada na entidade `User` com hash `BCrypt`, geração de `AccessToken` (JWT contendo `role` e `profileId`) e `RefreshToken`.
+   * Fluxo de **Primeiro Acesso** (`MustChangePassword = true`) quando a secretaria cadastra um novo aluno em `POST /api/management/students` (gera senha temporária com os 6 primeiros dígitos do CPF).
+2. **Motor de Agendamento com Validações Reais do DETRAN (`LessonBookingService.cs`):**
+   * **Anti-Double-Booking:** Impede colisão de horário para Aluno, Instrutor e Veículo simultaneamente.
+   * **Compatibilidade de Categoria:** Impede que um aluno de categoria `B` agende uma moto (`A`) ou um instrutor não habilitado.
+   * **Bloqueio de Frota:** Impede agendamento em veículos com status `MAINTENANCE` ou `INACTIVE`.
+   * **Limite Diário:** Máximo de 3 aulas práticas por dia para o mesmo aluno.
+   * **Regra de Cancelamento de 24h:** Alunos só podem cancelar aulas autonomamente com até 24h de antecedência.
+3. **Endpoints pensados para UX Moderna:**
+   * `GET /api/lessons/available-slots?date=2026-10-20&category=B`: Alimenta o **Wizard de Agendamento em 3 Passos** do Front-End retornando cada horário do dia e quais duplas de `Instrutor + Veículo` estão livres naquele slot.
+   * `GET /api/dashboard/student/{studentId}`: Alimenta a barra de progresso da CNH (Exame Médico -> Teórico -> Aulas Práticas `12/20` -> Status de aptidão para prova prática) + card da próxima aula.
+   * `GET /api/dashboard/admin`: Alimenta os KPIs operacionais da secretaria.
