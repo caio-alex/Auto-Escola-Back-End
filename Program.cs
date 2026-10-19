@@ -17,7 +17,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-app.UseCors("AllowFrontend");
+
 // 2. Database Configuration (Supports In-Memory out-of-the-box or SQL Server)
 bool useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase", true);
 if (useInMemory)
@@ -104,6 +104,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// ==========================================
+// AQUI É O PONTO CHAVE: builder.Build() ANTES de usar 'app'
+// ==========================================
 var app = builder.Build();
 
 // Seed Initial Demo Data (Admin, Instructors, Student, Fleet, Sample Lesson)

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AutoEscola.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+105440433d7a33f01986aba99a991fb6ed65cccb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a8376868edc1afde2a3fb058aa57d440ef6f9f8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("AutoEscola.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AutoEscola.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
